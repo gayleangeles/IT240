@@ -32,7 +32,6 @@ void addAppointment()
     scanf("%d", &newapp->app_mo);
     printf("Year: ");
     scanf("%d", &newapp->app_yr);
-    printf("Appointment Added!");
     printf("Appointment Time:\n");
     printf("Hour (0-23): ");
     scanf("%d", &newapp->apptime_hr);
@@ -56,10 +55,30 @@ void getAppointments(){
     {
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
-        printf("\nAppointments for (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
+        printf("\n\nAppointments for the day (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
         struct apptmnt *thisappt = start;
         while (thisappt != NULL){
             if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+            {
+                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+            }
+            thisappt = thisappt->next;      
+        }
+
+        printf("\n\nTomorrow (%d/%d/%d):", tm->tm_mday+1, tm->tm_mon+1, tm->tm_year+1900);
+        thisappt = start;
+        while (thisappt != NULL){
+            if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+            {
+                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+            }
+            thisappt = thisappt->next;      
+        }
+
+        printf("\n\nIn 2 Days (%d/%d/%d):", tm->tm_mday+2, tm->tm_mon+1, tm->tm_year+1900);
+        thisappt = start;
+        while (thisappt != NULL){
+            if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
             {
                 printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
             }
