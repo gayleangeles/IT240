@@ -12,15 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// time_t now = time(NULL);
-// struct tm *t = localtime(&now);
-// printf( "%d\n", t->tm_mon+1 );
-// printf( "%d\n", t->tm_mday );
-// printf( "%d\n", t->tm_year+1900 );
-// printf( "%d\n", t->tm_hour );
-// printf( "%d\n", t->tm_min );
-// printf( "%d\n", t->tm_sec );
-
 struct apptmnt
 {
     char desc[50];
@@ -42,7 +33,13 @@ void addAppointment()
     scanf("%d", &newapp->app_mo);
     printf("Year: ");
     scanf("%d", &newapp->app_yr);
-    printf("\nDescription: %s (%d/%d/%d)", newapp->desc, newapp->app_day, newapp->app_mo, newapp->app_yr);
+    printf("Appointment Added!");
+    printf("Appointment Time:\n");
+    printf("Hour (0-23): ");
+    scanf("%d", &newapp->apptime_hr);
+    printf("Minute (0-59): ");
+    scanf("%d", &newapp->apptime_min);
+    printf("Appointment Added!");
     if (start == NULL)
     {
         start = end = newapp;
@@ -58,16 +55,21 @@ void getAppointments(){
     int counter = 1;
     if (start)
     {
-        printf("\n\nAppointments for the day:");
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        printf("\nAppointments for (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
         struct apptmnt *thisappt = start;
         while (thisappt != NULL){
-            printf("\n%d. %s (%d/%d/%d)", counter++, thisappt->desc, thisappt->app_day, thisappt->app_mo, thisappt->app_yr);
+            if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+            {
+                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+            }
             thisappt = thisappt->next;      
         }
     }
     else
     {
-        printf("\nNo appointments\n");
+        printf("\nNo appointments");
     }
 }
 
@@ -86,10 +88,10 @@ int main()
     printf("2. Create a new appointment\n");
     printf("3. Remove a specific appointment\n");
     printf("4. Clear all appointments for a given day\n");
-    printf("5. Exit the program\n");
+    printf("5. Exit the program");
     while (choice != 5)
     {
-        printf("\nEnter: ");
+        printf("\n\nEnter Choice: ");
         scanf("%d", &choice);
         switch(choice) {
             case 1 :
