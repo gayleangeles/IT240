@@ -32,9 +32,7 @@ struct apptmnt *newapp = NULL, *start = NULL, *end = NULL;
 
 void addAppointment()
 {
-    //TODO: Scanf not terminating on whitespace input
     newapp = (struct apptmnt *) malloc(sizeof(struct apptmnt));
-    // printf("%d\n", newapp);
     printf("\nInput new appointment description: ");
     scanf("%s", &newapp->desc);
     printf("Appointment Date:\n");
@@ -44,32 +42,26 @@ void addAppointment()
     scanf("%d", &newapp->app_mo);
     printf("Year: ");
     scanf("%d", &newapp->app_yr);
-    printf("\nDescription: %s Day: %d  Month: %d  Year: %d", newapp->desc, newapp->app_day, newapp->app_mo, newapp->app_yr);
+    printf("\nDescription: %s (%d/%d/%d)", newapp->desc, newapp->app_day, newapp->app_mo, newapp->app_yr);
     if (start == NULL)
     {
         start = end = newapp;
-        printf("star == 0");
-        // printf("\n%d AND %d", start, start->next);
-        // newapp->next = 0;
     }
     else 
     {
-        printf("else");
         end->next = newapp;
         end = end->next;
     }
 }
 
 void getAppointments(){
-   
+    int counter = 1;
     if (start)
     {
-        // printf("%d AND %d", start, start->next);
         printf("\n\nAppointments for the day:");
         struct apptmnt *thisappt = start;
-        // printf("%d AND %d", app, app->next);
         while (thisappt != NULL){
-            printf("\nDescription: %s Day: %d  Month: %d  Year: %d", thisappt->desc, thisappt->app_day, thisappt->app_mo, thisappt->app_yr);
+            printf("\n%d. %s (%d/%d/%d)", counter++, thisappt->desc, thisappt->app_day, thisappt->app_mo, thisappt->app_yr);
             thisappt = thisappt->next;      
         }
     }
