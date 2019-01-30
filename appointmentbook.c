@@ -21,18 +21,68 @@
 // printf( "%d\n", t->tm_min );
 // printf( "%d\n", t->tm_sec );
 
+struct apptmnt
+{
+    char desc[50];
+    int apptime_hr, apptime_min, app_day, app_mo, app_yr;
+    struct apptmnt *next;
+};
+
+struct apptmnt *newapp = NULL, *start = NULL, *end = NULL;
+
+void addAppointment()
+{
+    //TODO: Scanf not terminating on whitespace input
+    newapp = (struct apptmnt *) malloc(sizeof(struct apptmnt));
+    // printf("%d\n", newapp);
+    printf("\nInput new appointment description: ");
+    scanf("%s", &newapp->desc);
+    printf("Appointment Date:\n");
+    printf("Day (1-31): ");
+    scanf("%d", &newapp->app_day);
+    printf("Month (1-12): ");
+    scanf("%d", &newapp->app_mo);
+    printf("Year: ");
+    scanf("%d", &newapp->app_yr);
+    printf("\nDescription: %s Day: %d  Month: %d  Year: %d", newapp->desc, newapp->app_day, newapp->app_mo, newapp->app_yr);
+    if (start == NULL)
+    {
+        start = end = newapp;
+        printf("star == 0");
+        // printf("\n%d AND %d", start, start->next);
+        // newapp->next = 0;
+    }
+    else 
+    {
+        printf("else");
+        end->next = newapp;
+        end = end->next;
+    }
+}
+
+void getAppointments(){
+   
+    if (start)
+    {
+        // printf("%d AND %d", start, start->next);
+        printf("\n\nAppointments for the day:");
+        struct apptmnt *thisappt = start;
+        // printf("%d AND %d", app, app->next);
+        while (thisappt != NULL){
+            printf("\nDescription: %s Day: %d  Month: %d  Year: %d", thisappt->desc, thisappt->app_day, thisappt->app_mo, thisappt->app_yr);
+            thisappt = thisappt->next;      
+        }
+    }
+    else
+    {
+        printf("\nNo appointments\n");
+    }
+}
+
+
 int main()
 {  
-    struct apptmnt
-    {
-        char desc[50];
-        int apptime_hr, apptime_min, app_day, app_mo, app_yr;
-        struct apptmnt *next;
-    };
-
-    struct apptmnt *newapp = NULL, *start = NULL, *end = NULL;
-
-    int choice;
+    int choice = 0;
 
     printf("\n\n*******************************\n");
     printf("*                             *\n");
@@ -51,32 +101,10 @@ int main()
         scanf("%d", &choice);
         switch(choice) {
             case 1 :
-                printf("1. Display all appointments\n");
+                getAppointments();
                 break;    
             case 2:
-                //TODO: Scanf not terminating on whitespace input
-                newapp = (struct apptmnt *) malloc(sizeof(struct apptmnt));
-                printf("%d\n", newapp);
-                printf("\nInput new appointment description: ");
-                scanf("%s", &newapp->desc);
-                printf("\nAppointment Date:");
-                printf("\nDay (1-31): ");
-                scanf("%d", &newapp->app_day);
-                printf("\nMonth (1-12): ");
-                scanf("%d", &newapp->app_mo);
-                printf("\nYear: ");
-                scanf("%d", &newapp->app_yr);
-                printf("\nDescription: %s Day: %d  Month: %d  Year: %d", newapp->desc, newapp->app_day, newapp->app_mo, newapp->app_yr);
-                if (start == NULL)
-                {
-                    start = end = newapp;
-                    newapp->next = NULL;
-                }
-                else 
-                {
-                    end->next = newapp;
-                    end = end->next;
-                }
+                addAppointment();
                 break;
             case 3:
                 printf("3. Remove a specific appointment\n");
