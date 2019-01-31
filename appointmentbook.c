@@ -167,6 +167,67 @@ void removeAppointment()
             if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr 
                 && next->apptime_hr == choiceappt.apptime_hr && next->apptime_min == choiceappt.apptime_min)
             {
+                found = 1;
+                break;
+            }
+            prevappt = next;   
+            next = next->next;       
+        }
+
+        if (found)
+        {
+            printf("\nAre you sure you want to remove appointment \" %s \". (Y/N): ", next->desc);
+            scanf(" %c", &choice);
+            if(choice == 'Y' || choice == 'y') {
+                if (next == start)
+                {
+                    start = start->next;
+                }
+                else
+                {
+                    prevappt->next = next->next;
+                }
+                free(next);
+                printf("\nAppointment removed.");
+            } else if(choice == 'N' || choice == 'n') {
+                //*TO DO: retains the targeted appointment
+            } else 
+            printf("\nInvalid input. Y / N only.");
+        }
+        else{
+            printf("\nAppointment not found.");
+        }
+    }
+    else
+    {
+        printf("\nNo Appointments.");
+    }
+}
+
+void clearAppointments()
+{
+    int counter = 1;
+    char choice;
+    bool found = 0;
+    
+    if (start)
+    {
+        struct apptmnt choiceappt;
+        printf("\nEnter date of the appointments you wish to clear: \n");
+        printf("\tDay (1-31): ");
+        scanf("%d", &choiceappt.app_day);
+        printf("\tMonth (1-12): ");
+        scanf("%d", &choiceappt.app_mo);
+        printf("\tYear: ");
+        scanf("%d", &choiceappt.app_yr);
+
+        struct apptmnt *prevappt = NULL;
+        struct apptmnt *next = start;
+
+        while (next != NULL)
+        {
+            if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr)
+            {
                 if (next == start)
                 {
                     start = start->next;
@@ -182,19 +243,35 @@ void removeAppointment()
             next = next->next;       
         }
 
-        if (found)
+        if (found) 
         {
-            free(next);
-            printf("\n\nAppointment removed.");
-        }
-        else{
+            printf("\nAppointments for (%d/%d/%d):", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
+            struct apptmnt *thisappt = start;
+            while (thisappt != NULL){
+                if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
+                {
+                    printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                }
+                thisappt = thisappt->next;      
+            }
+            printf("\n\nAre you sure you want to clear appointments on (%d/%d/%d). (Y/N): ", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
+            scanf("%s", choice);
+            choice = getchar();
+            if(choice == 'Y' || choice == 'y') {
+                free(next);
+                printf("\nAppointment removed.");
+            } else if(choice == 'N' || choice == 'n') {
+                //*TO DO: retains the targeted appointment
+            } else 
+            printf("\nInvalid input. Y / N only.");
+
+        }else {
             printf("\nAppointment not found.");
         }
-    }
-    else
-    {
+    }else {
         printf("\nNo Appointments.");
     }
+
 }
 
 int main()
@@ -227,7 +304,7 @@ int main()
                 removeAppointment();
                 break;
             case 4:
-                printf("4. Clear all appointments for a given day\n");
+                clearAppointments();
                 break;
             case 5: break;
             default: 
