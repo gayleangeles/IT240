@@ -10,6 +10,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <conio.h>
 
 struct apptmnt
 {
@@ -26,16 +27,16 @@ void addAppointment()
     printf("\nInput new appointment description: ");
     scanf("%s", &newapp->desc);
     printf("Appointment Date:\n");
-    printf("Day (1-31): ");
+    printf("\tDay (1-31): ");
     scanf("%d", &newapp->app_day);
-    printf("Month (1-12): ");
+    printf("\tMonth (1-12): ");
     scanf("%d", &newapp->app_mo);
-    printf("Year: ");
+    printf("\tYear: ");
     scanf("%d", &newapp->app_yr);
     printf("Appointment Time:\n");
-    printf("Hour (0-23): ");
+    printf("\tHour (0-23): ");
     scanf("%d", &newapp->apptime_hr);
-    printf("Minute (0-59): ");
+    printf("\tMinute (0-59): ");
     scanf("%d", &newapp->apptime_min);
     printf("Appointment Added!");
     if (start == NULL)
@@ -91,6 +92,90 @@ void getAppointments(){
     }
 }
 
+void deleteAppointment(int hr, int min)
+{
+    typedef struct apptmnt *thisappt;
+    thisappt appt = start, end;
+
+    if (appt != NULL
+        && appt->apptime_hr == hr
+        && appt->apptime_min == min)
+    {
+        start = appt->next;
+        free(appt);
+        return;
+    }
+
+    while (appt != NULL
+        && appt->apptime_hr != hr
+        && appt->apptime_min != min)
+    {
+        end = appt;
+        appt = appt->next;
+    }
+
+    if (appt == NULL) return;
+
+    end->next = appt->next;
+
+    free(appt);
+}
+
+void removeAppointments()
+{
+    int counter = 1;
+    char choice;
+    if (start)
+    {
+
+        struct apptmnt *choiceappt = start;
+        printf("Enter date of the appointment you wish to remove: \n");
+        printf("\tDay (1-31): ");
+        scanf("%d", &choiceappt->app_day);
+        printf("\tMonth (1-12): ");
+        scanf("%d", &choiceappt->app_mo);
+        printf("\tYear: ");
+        scanf("%d", &choiceappt->app_yr);
+
+        printf("\n\nAppointments for (%d/%d/%d):", choiceappt->app_day, choiceappt->app_mo, choiceappt->app_yr);
+        struct apptmnt *thisappt = start;
+        while (thisappt != NULL){
+            if (thisappt->app_day == choiceappt->app_day && thisappt->app_mo == choiceappt->app_mo && thisappt->app_yr == choiceappt->app_yr)
+            {
+                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+            }
+            thisappt = thisappt->next;      
+        }
+
+        printf("\n\nEnter time of appointment you wish to remove: ");
+        printf("\n\tHour (0-23): ");
+        scanf("%d", &choiceappt->apptime_hr);
+        printf("\tMinute (0-59): ");
+        scanf("%d", &choiceappt->apptime_min);
+
+        while (thisappt != NULL){
+            if (thisappt->app_day == choiceappt->app_day && thisappt->app_mo == choiceappt->app_mo && thisappt->app_yr == choiceappt->app_yr 
+                && thisappt->apptime_hr == choiceappt->apptime_hr && thisappt->apptime_min == choiceappt->apptime_min)
+            {
+                printf("\nAre you sure you want to remove appointment \" %s \". (Y/N): ", thisappt->desc);
+                scanf("%s", choice);
+            }
+            thisappt = thisappt->next;      
+        }
+
+        if(choice == 'Y' || choice == 'y') {
+            deleteAppointment(thisappt->apptime_hr, thisappt->apptime_min);
+            printf("\n\nAppointment removed.");
+        } else if(choice == 'N' || choice == 'n') {
+            //return to menu??
+        } else 
+        printf("Invalid input. Y / N only.");
+    }
+    else
+    {
+        printf("\nAppointment not found.");
+    }
+}
 
 int main()
 {  
@@ -119,13 +204,17 @@ int main()
                 addAppointment();
                 break;
             case 3:
-                printf("3. Remove a specific appointment\n");
+                removeAppointments();
                 break;
             case 4:
                 printf("4. Clear all appointments for a given day\n");
                 break;
             case 5: break;
-            default: printf("Invalid Input");
+            default: 
+                printf("Invalid Input");
+                printf("\nPress any key to continue...");
+                getch();
+                break;
         }
     }
      printf("%c", newapp->desc);
