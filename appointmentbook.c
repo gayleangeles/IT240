@@ -141,8 +141,14 @@ void getAppointments(){
     if (start)
     {
         printf("\nList of Appointments:");
+
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
+        struct tm tmtomorrow = { .tm_year = tm->tm_year, .tm_mon = tm->tm_mon, .tm_mday= tm->tm_mday+1 };
+        struct tm tmdayafter = { .tm_year = tm->tm_year, .tm_mon = tm->tm_mon, .tm_mday= tm->tm_mday+2 };
+        mktime(&tmtomorrow);
+        mktime(&tmdayafter);
+
         struct apptmnt *thisappt = start;
 
         while (thisappt != NULL)
@@ -151,11 +157,11 @@ void getAppointments(){
             {
                 today = 1;
             }
-            if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && tom == 0)
+            if (thisappt->app_day == tmtomorrow.tm_mday && thisappt->app_mo == tmtomorrow.tm_mon+1 && thisappt->app_yr == tmtomorrow.tm_year+1900 && today == 0)
             {
                 tom = 1;
             }
-            if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && dayafter == 0)
+            if (thisappt->app_day == tmdayafter.tm_mday && thisappt->app_mo == tmdayafter.tm_mon+1 && thisappt->app_yr == tmdayafter.tm_year+1900 && today == 0)
             {
                 dayafter = 1;
             }
@@ -181,11 +187,11 @@ void getAppointments(){
         // PRINT APPOINTMENTS FOR TOMORROW
         if (tom == 1)
         {
-            printf("\n\nTomorrow (%d/%d/%d):", tm->tm_mday+1, tm->tm_mon+1, tm->tm_year+1900);
+            printf("\n\nTomorrow (%d/%d/%d):", tmtomorrow.tm_mday, tmtomorrow.tm_mon+1, tmtomorrow.tm_year+1900);
             thisappt = start;
             while (thisappt != NULL)
             {
-                if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+                if (thisappt->app_day == tmtomorrow.tm_mday && thisappt->app_mo == tmtomorrow.tm_mon+1 && thisappt->app_yr == tmtomorrow.tm_year+1900)
                 {
                     printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
                 }
@@ -196,11 +202,11 @@ void getAppointments(){
         // PRINT APPOINTMENTS FOR THE DAY AFTER TOMORROW
         if (dayafter == 1)
         {
-            printf("\n\nIn 2 Days (%d/%d/%d):", tm->tm_mday+2, tm->tm_mon+1, tm->tm_year+1900);
+            printf("\n\nIn 2 Days (%d/%d/%d):", tmdayafter.tm_mday, tmdayafter.tm_mon+1, tmdayafter.tm_year+1900);
             thisappt = start;
             while (thisappt != NULL)
             {
-                if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+                if (thisappt->app_day == tmdayafter.tm_mday && thisappt->app_mo == tmdayafter.tm_mon+1 && thisappt->app_yr == tmdayafter.tm_year+1900)
                 {
                     printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
                 }
