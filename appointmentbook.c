@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <stdbool.h>
 
 struct apptmnt
 {
@@ -52,38 +53,71 @@ void addAppointment()
 
 void getAppointments(){
     int counter = 1;
+    bool today = 0, tom = 0, dayafter = 0;
     if (start)
     {
+        printf("\nList of Appointments:");
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
-        printf("\n\nAppointments for the day (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
         struct apptmnt *thisappt = start;
+
         while (thisappt != NULL){
-            if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+            if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && today == 0)
             {
-                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                today = 1;
+            }
+            if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && tom == 0)
+            {
+                tom = 1;
+            }
+            if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && dayafter == 0)
+            {
+                dayafter = 1;
             }
             thisappt = thisappt->next;      
         }
 
-        printf("\n\nTomorrow (%d/%d/%d):", tm->tm_mday+1, tm->tm_mon+1, tm->tm_year+1900);
-        thisappt = start;
-        while (thisappt != NULL){
-            if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
-            {
-                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+
+        // PRINT APPOINTMENTS FOR TODAY      
+        if (today == 1)          
+        {
+            printf("\n\nAppointments for the day (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
+            thisappt = start;
+            while (thisappt != NULL){
+                if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+                {
+                    printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                }
+                thisappt = thisappt->next;      
             }
-            thisappt = thisappt->next;      
         }
 
-        printf("\n\nIn 2 Days (%d/%d/%d):", tm->tm_mday+2, tm->tm_mon+1, tm->tm_year+1900);
-        thisappt = start;
-        while (thisappt != NULL){
-            if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
-            {
-                printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+        // PRINT APPOINTMENTS FOR TOMORROW
+        if (tom == 1)
+        {
+            printf("\n\nTomorrow (%d/%d/%d):", tm->tm_mday+1, tm->tm_mon+1, tm->tm_year+1900);
+            thisappt = start;
+            while (thisappt != NULL){
+                if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+                {
+                    printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                }
+                thisappt = thisappt->next;      
             }
-            thisappt = thisappt->next;      
+        }
+
+        // PRINT APPOINTMENTS FOR THE DAY AFTER TOMORROW
+        if (dayafter == 1)
+        {
+            printf("\n\nIn 2 Days (%d/%d/%d):", tm->tm_mday+2, tm->tm_mon+1, tm->tm_year+1900);
+            thisappt = start;
+            while (thisappt != NULL){
+                if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
+                {
+                    printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                }
+                thisappt = thisappt->next;      
+            }
         }
     }
     else
@@ -128,19 +162,19 @@ void removeAppointments()
     if (start)
     {
 
-        struct apptmnt *choiceappt = start;
+        struct apptmnt choiceappt;
         printf("Enter date of the appointment you wish to remove: \n");
         printf("\tDay (1-31): ");
-        scanf("%d", &choiceappt->app_day);
+        scanf("%d", &choiceappt.app_day);
         printf("\tMonth (1-12): ");
-        scanf("%d", &choiceappt->app_mo);
+        scanf("%d", &choiceappt.app_mo);
         printf("\tYear: ");
-        scanf("%d", &choiceappt->app_yr);
+        scanf("%d", &choiceappt.app_yr);
 
-        printf("\n\nAppointments for (%d/%d/%d):", choiceappt->app_day, choiceappt->app_mo, choiceappt->app_yr);
+        printf("\n\nAppointments for (%d/%d/%d):", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
         struct apptmnt *thisappt = start;
         while (thisappt != NULL){
-            if (thisappt->app_day == choiceappt->app_day && thisappt->app_mo == choiceappt->app_mo && thisappt->app_yr == choiceappt->app_yr)
+            if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
             {
                 printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
             }
@@ -149,13 +183,14 @@ void removeAppointments()
 
         printf("\n\nEnter time of appointment you wish to remove: ");
         printf("\n\tHour (0-23): ");
-        scanf("%d", &choiceappt->apptime_hr);
+        scanf("%d", &choiceappt.apptime_hr);
         printf("\tMinute (0-59): ");
-        scanf("%d", &choiceappt->apptime_min);
+        scanf("%d", &choiceappt.apptime_min);
 
+        //TODO: I think ito nagacause ng crash wala ata dapat sa loop ang "are you sure"
         while (thisappt != NULL){
-            if (thisappt->app_day == choiceappt->app_day && thisappt->app_mo == choiceappt->app_mo && thisappt->app_yr == choiceappt->app_yr 
-                && thisappt->apptime_hr == choiceappt->apptime_hr && thisappt->apptime_min == choiceappt->apptime_min)
+            if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr 
+                && thisappt->apptime_hr == choiceappt.apptime_hr && thisappt->apptime_min == choiceappt.apptime_min)
             {
                 printf("\nAre you sure you want to remove appointment \" %s \". (Y/N): ", thisappt->desc);
                 scanf("%s", choice);
