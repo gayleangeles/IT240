@@ -26,7 +26,7 @@ void addAppointment()
 {
     newapp = (struct apptmnt *) malloc(sizeof(struct apptmnt));
     printf("\nInput new appointment description: ");
-    scanf("%s", &newapp->desc);
+    scanf(" %[^\t\n]s", &newapp->desc);
     printf("Appointment Date:\n");
     printf("\tDay (1-31): ");
     scanf("%d", &newapp->app_day);
@@ -126,42 +126,14 @@ void getAppointments(){
     }
 }
 
-void deleteAppointment(int hr, int min)
-{
-    typedef struct apptmnt *thisappt;
-    thisappt appt = start, end;
-
-    if (appt != NULL
-        && appt->apptime_hr == hr
-        && appt->apptime_min == min)
-    {
-        start = appt->next;
-        free(appt);
-        return;
-    }
-
-    while (appt != NULL
-        && appt->apptime_hr != hr
-        && appt->apptime_min != min)
-    {
-        end = appt;
-        appt = appt->next;
-    }
-
-    if (appt == NULL) return;
-
-    end->next = appt->next;
-
-    free(appt);
-}
-
-void removeAppointments()
+void removeAppointment()
 {
     int counter = 1;
     char choice;
+    bool found = 0;
+    
     if (start)
     {
-
         struct apptmnt choiceappt;
         printf("Enter date of the appointment you wish to remove: \n");
         printf("\tDay (1-31): ");
@@ -187,28 +159,35 @@ void removeAppointments()
         printf("\tMinute (0-59): ");
         scanf("%d", &choiceappt.apptime_min);
 
-        //TODO: I think ito nagacause ng crash wala ata dapat sa loop ang "are you sure"
-        while (thisappt != NULL){
-            if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr 
-                && thisappt->apptime_hr == choiceappt.apptime_hr && thisappt->apptime_min == choiceappt.apptime_min)
+        struct apptmnt *prevappt = NULL;
+        struct apptmnt *next = start;
+
+        while (next != NULL)
+        {
+            if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr 
+                && next->apptime_hr == choiceappt.apptime_hr && next->apptime_min == choiceappt.apptime_min)
             {
-                printf("\nAre you sure you want to remove appointment \" %s \". (Y/N): ", thisappt->desc);
-                scanf("%s", choice);
+                printf("FOUND YAH");
+                found = 1;
+                break;
             }
-            thisappt = thisappt->next;      
+            prevappt = next->next;   
+            next->next = prevappt;
+            next = next->next;       
         }
 
-        if(choice == 'Y' || choice == 'y') {
-            deleteAppointment(thisappt->apptime_hr, thisappt->apptime_min);
+        if (found)
+        {
+            free(next);
             printf("\n\nAppointment removed.");
-        } else if(choice == 'N' || choice == 'n') {
-            //return to menu??
-        } else 
-        printf("Invalid input. Y / N only.");
+        }
+        else{
+            printf("\nAppointment not found.");
+        }
     }
     else
     {
-        printf("\nAppointment not found.");
+        printf("\nNo Appointments.");
     }
 }
 
@@ -239,7 +218,7 @@ int main()
                 addAppointment();
                 break;
             case 3:
-                removeAppointments();
+                removeAppointment();
                 break;
             case 4:
                 printf("4. Clear all appointments for a given day\n");
