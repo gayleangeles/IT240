@@ -1,11 +1,11 @@
-/***********************************
- *PROGRAM: appointmentbook.c
- *DESCRIPTION: Program for tracking appointments
- *CREATED BY: Gayle Angeles
-              Janelle Fernandez  
- *DATE CREATED: 29 January 2019
- *DATE MODIFIED: 
- ***********************************
+/************************************
+ * PROGRAM:      AngelesFernandez.c *
+ * DESCRIPTION:  Appointment Book   *
+ * CREATED BY:   Gabrielle Angeles  *
+ *               Janelle Fernandez  * 
+ * DATE CREATED: 28 January 2019    *
+ * DATE MODIFIED:                   *
+ ************************************
  */
 
 #include <time.h>
@@ -157,11 +157,11 @@ void getAppointments(){
             {
                 today = 1;
             }
-            if (thisappt->app_day == tmtomorrow.tm_mday && thisappt->app_mo == tmtomorrow.tm_mon+1 && thisappt->app_yr == tmtomorrow.tm_year+1900 && today == 0)
+            if (thisappt->app_day == tmtomorrow.tm_mday && thisappt->app_mo == tmtomorrow.tm_mon+1 && thisappt->app_yr == tmtomorrow.tm_year+1900 && tom == 0)
             {
                 tom = 1;
             }
-            if (thisappt->app_day == tmdayafter.tm_mday && thisappt->app_mo == tmdayafter.tm_mon+1 && thisappt->app_yr == tmdayafter.tm_year+1900 && today == 0)
+            if (thisappt->app_day == tmdayafter.tm_mday && thisappt->app_mo == tmdayafter.tm_mon+1 && thisappt->app_yr == tmdayafter.tm_year+1900 && dayafter == 0)
             {
                 dayafter = 1;
             }
@@ -355,7 +355,7 @@ void clearAppointments()
             {
                 if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
                 {
-                    printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
+                    printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
                 }
                 thisappt = thisappt->next;      
             }
@@ -384,10 +384,9 @@ void clearAppointments()
                         else
                         {
                             prevappt->next = next->next;
-                            printf("\nFREE NEXT %d", next);
-                            free(next);
-                            prevappt = next;   
+                            holder = next;   
                             next = next->next;   
+                            free(holder); 
                         }                       
                     }
                     else
