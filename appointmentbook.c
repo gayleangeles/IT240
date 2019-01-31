@@ -1,7 +1,8 @@
 /***********************************
  *PROGRAM: appointmentbook.c
- *DESCRIPTION: Initial program...
+ *DESCRIPTION: Program for tracking appointments
  *CREATED BY: Gayle Angeles
+              Janelle Fernandez  
  *DATE CREATED: 29 January 2019
  *DATE MODIFIED: 
  ***********************************
@@ -22,9 +23,68 @@ struct apptmnt
 
 struct apptmnt *newapp = NULL, *start = NULL, *end = NULL;
 
+bool checkDate(int d, int m, int y)
+{
+    if (m < 1 || m > 12) {
+        return false;
+    }
+    if (d < 1) {
+        return false;
+    }
+
+    int days = 31;
+    if (m == 2) {
+        days = 28;
+        if (y % 400 == 0 || (y % 4 == 0 && y % 100 != 0)) {
+            days = 29;
+        }
+    } else if (m == 4 || m == 6 || m == 9 || m == 11) {
+        days = 30;
+    }
+
+    if (d > days) {
+        return false;
+    }
+
+    return true;
+}
+
+bool checkTime(int hr, int min) 
+{
+    if (hr > 23 || hr < 0) 
+        return false;
+
+    if (min > 59 || min < 0) 
+        return false;
+
+    return true;
+}
+
+bool isPastDate(int d, int m, int y) {
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    
+    struct tm setDate = { .tm_year = y - 1900, .tm_mon = m - 1, .tm_mday = d};
+    struct tm pastDate = { .tm_year = tm->tm_year, .tm_mon = tm->tm_mon, .tm_mday = tm->tm_mday};
+
+    time_t date1 = mktime(&setDate);
+    time_t date2 = mktime(&pastDate);
+    
+    double diff = difftime(date1, date2);
+
+    if (diff < 0)
+        return false;
+    
+    return true;   
+}
+
 void addAppointment()
 {
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
     newapp = (struct apptmnt *) malloc(sizeof(struct apptmnt));
+    newapp->next = 0;
     printf("\nInput new appointment description: ");
     scanf(" %[^\t\n]s", &newapp->desc);
     printf("Appointment Date:\n");
@@ -34,14 +94,36 @@ void addAppointment()
     scanf("%d", &newapp->app_mo);
     printf("\tYear: ");
     scanf("%d", &newapp->app_yr);
+
+    if (!checkDate(newapp->app_day, newapp->app_mo, newapp->app_yr)) 
+    {
+        printf("Invalid Date! (%d/%d/%d) Please enter correct date.\n", newapp->app_day, newapp->app_mo, newapp->app_yr);
+        free(newapp);
+        return;
+    }
+
+    if (!isPastDate(newapp->app_day, newapp->app_mo, newapp->app_yr)) 
+    {
+        printf("Invalid Date! Date should not be before (%d-%d-%d).", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
+        free(newapp);
+        return;
+    }    
+
     printf("Appointment Time:\n");
     printf("\tHour (0-23): ");
     scanf("%d", &newapp->apptime_hr);
     printf("\tMinute (0-59): ");
     scanf("%d", &newapp->apptime_min);
-    printf("Appointment Added!");
-    if (start == NULL)
+
+    if (!checkTime(newapp->apptime_hr, newapp->apptime_min)) 
     {
+        printf("Invalid Time! (%d:%d) Please enter correct time.\n", newapp->apptime_hr, newapp->apptime_min);
+        free(newapp);
+        return;
+    }
+
+    if (start <= 0)
+    {        
         start = end = newapp;
     }
     else 
@@ -49,6 +131,8 @@ void addAppointment()
         end->next = newapp;
         end = end->next;
     }
+
+    printf("Appointment Added!");
 }
 
 void getAppointments(){
@@ -61,7 +145,8 @@ void getAppointments(){
         struct tm *tm = localtime(&t);
         struct apptmnt *thisappt = start;
 
-        while (thisappt != NULL){
+        while (thisappt != NULL)
+        {
             if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900 && today == 0)
             {
                 today = 1;
@@ -83,7 +168,8 @@ void getAppointments(){
         {
             printf("\n\nAppointments for the day (%d/%d/%d):", tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
             thisappt = start;
-            while (thisappt != NULL){
+            while (thisappt != NULL)
+            {
                 if (thisappt->app_day == tm->tm_mday && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
                 {
                     printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
@@ -97,7 +183,8 @@ void getAppointments(){
         {
             printf("\n\nTomorrow (%d/%d/%d):", tm->tm_mday+1, tm->tm_mon+1, tm->tm_year+1900);
             thisappt = start;
-            while (thisappt != NULL){
+            while (thisappt != NULL)
+            {
                 if (thisappt->app_day == tm->tm_mday+1 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
                 {
                     printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
@@ -111,7 +198,8 @@ void getAppointments(){
         {
             printf("\n\nIn 2 Days (%d/%d/%d):", tm->tm_mday+2, tm->tm_mon+1, tm->tm_year+1900);
             thisappt = start;
-            while (thisappt != NULL){
+            while (thisappt != NULL)
+            {
                 if (thisappt->app_day == tm->tm_mday+2 && thisappt->app_mo == tm->tm_mon+1 && thisappt->app_yr == tm->tm_year+1900)
                 {
                     printf("\n\t%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
@@ -143,9 +231,16 @@ void removeAppointment()
         printf("\tYear: ");
         scanf("%d", &choiceappt.app_yr);
 
+        if (!checkDate(newapp->app_day, newapp->app_mo, newapp->app_yr)) 
+        {
+            printf("Invalid Date! (%d/%d/%d) Please enter correct date.\n", newapp->app_day, newapp->app_mo, newapp->app_yr);
+            return;
+        }
+
         printf("\n\nAppointments for (%d/%d/%d):", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
         struct apptmnt *thisappt = start;
-        while (thisappt != NULL){
+        while (thisappt != NULL)
+        {
             if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
             {
                 printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
@@ -159,12 +254,18 @@ void removeAppointment()
         printf("\tMinute (0-59): ");
         scanf("%d", &choiceappt.apptime_min);
 
+        if (!checkTime(newapp->apptime_hr, newapp->apptime_min)) 
+        {
+            printf("Invalid Time! (%d:%d) Please enter correct time.\n", newapp->apptime_hr, newapp->apptime_min);
+            return;
+        }
+
         struct apptmnt *prevappt = NULL;
         struct apptmnt *next = start;
 
         while (next != NULL)
         {
-            if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr 
+            if (next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr 
                 && next->apptime_hr == choiceappt.apptime_hr && next->apptime_min == choiceappt.apptime_min)
             {
                 found = 1;
@@ -181,16 +282,18 @@ void removeAppointment()
             if(choice == 'Y' || choice == 'y') {
                 if (next == start)
                 {
-                    start = start->next;
+                    struct apptmnt *holder = start->next;     
+                    free(start);               
+                    start = holder;
                 }
                 else
                 {
                     prevappt->next = next->next;
-                }
-                free(next);
+                    free(next);
+                }                
                 printf("\nAppointment removed.");
             } else if(choice == 'N' || choice == 'n') {
-                //*TO DO: retains the targeted appointment
+                return;
             } else 
             printf("\nInvalid input. Y / N only.");
         }
@@ -221,57 +324,90 @@ void clearAppointments()
         printf("\tYear: ");
         scanf("%d", &choiceappt.app_yr);
 
-        struct apptmnt *prevappt = NULL;
-        struct apptmnt *next = start;
+        if (!checkDate(newapp->app_day, newapp->app_mo, newapp->app_yr)) {
+            printf("Invalid Date! (%d/%d/%d) Please enter correct date.\n", newapp->app_day, newapp->app_mo, newapp->app_yr);
+            return;
+        }
 
-        while (next != NULL)
+        struct apptmnt *thisappt = start;
+
+        while (thisappt != NULL)
         {
-            if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr)
+            if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
             {
-                if (next == start)
-                {
-                    start = start->next;
-                }
-                else
-                {
-                    prevappt->next = next->next;
-                }
                 found = 1;
                 break;
             }
-            prevappt = next;   
-            next = next->next;       
+            thisappt = thisappt->next;       
         }
 
         if (found) 
         {
             printf("\nAppointments for (%d/%d/%d):", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
             struct apptmnt *thisappt = start;
-            while (thisappt != NULL){
+            while (thisappt != NULL)
+            {
                 if (thisappt->app_day == choiceappt.app_day && thisappt->app_mo == choiceappt.app_mo && thisappt->app_yr == choiceappt.app_yr)
                 {
                     printf("\n%d. %s  (%d:%d)", counter++, thisappt->desc, thisappt->apptime_hr, thisappt->apptime_min);
                 }
                 thisappt = thisappt->next;      
             }
+
             printf("\n\nAre you sure you want to clear appointments on (%d/%d/%d). (Y/N): ", choiceappt.app_day, choiceappt.app_mo, choiceappt.app_yr);
-            scanf("%s", choice);
-            choice = getchar();
-            if(choice == 'Y' || choice == 'y') {
-                free(next);
-                printf("\nAppointment removed.");
-            } else if(choice == 'N' || choice == 'n') {
-                //*TO DO: retains the targeted appointment
+            scanf("%s", &choice);
+            
+            if (choice == 'Y' || choice == 'y') 
+            {
+                struct apptmnt *prevappt = NULL;
+                struct apptmnt *holder = NULL;
+                struct apptmnt *next = start;
+                
+                while (next != NULL)
+                {
+                    if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr)
+                    {
+                        if (next == start)
+                        {
+                            holder = start;   
+                            start = start->next;  
+                            free(holder);      
+                            next = start;         
+                            prevappt = next;   
+                        }
+                        else
+                        {
+                            prevappt->next = next->next;
+                            printf("\nFREE NEXT %d", next);
+                            free(next);
+                            prevappt = next;   
+                            next = next->next;   
+                        }                       
+                    }
+                    else
+                    {
+                        prevappt = next;   
+                        next = next->next;   
+                    }                   
+                }
+                printf("\nAppointments cleared.");
+            } 
+            else if(choice == 'N' || choice == 'n') 
+            {
+                return;
             } else 
             printf("\nInvalid input. Y / N only.");
 
-        }else {
+        }
+        else 
+        {
             printf("\nAppointment not found.");
         }
-    }else {
+    }
+    else 
+    {
         printf("\nNo Appointments.");
     }
-
 }
 
 int main()
@@ -314,7 +450,4 @@ int main()
                 break;
         }
     }
-     printf("%c", newapp->desc);
-
-
 }
