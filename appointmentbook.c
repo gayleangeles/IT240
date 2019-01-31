@@ -167,12 +167,12 @@ void removeAppointment()
             if(next->app_day == choiceappt.app_day && next->app_mo == choiceappt.app_mo && next->app_yr == choiceappt.app_yr 
                 && next->apptime_hr == choiceappt.apptime_hr && next->apptime_min == choiceappt.apptime_min)
             {
+                prevappt->next = next->next;
                 printf("FOUND YAH");
                 found = 1;
                 break;
             }
-            prevappt = next->next;   
-            next->next = prevappt;
+            prevappt = next;   
             next = next->next;       
         }
 
